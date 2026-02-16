@@ -8,10 +8,10 @@
     <script>
       AFRAME.registerComponent('video-handler', {
         schema: {
-          videoElement: {type: 'selector'}
+          target: {type: 'selector'}
         },
         init: function () {
-          const video = this.data.videoElement;
+          const video = this.data.target;
           this.el.addEventListener('targetFound', () => {
             video.play();
           });
@@ -24,25 +24,25 @@
   </head>
   <body>
     <a-scene 
-      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; maxTrack: 2" 
+      mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/combined.mind; maxTrack: 2" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <video id="video1" src="https://video-indiatoday.tosshub.com/indiatoday/video/2026_02/16_feb_26_rijiju_1771216926027_720.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
-        <video id="video2" src="https://video-indiatoday.tosshub.com/indiatoday/video/2026_02/15_feb_26_axar_patel_press_conference_720.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+        <video id="blinkitVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+        <video id="haldiramVideo" src="https://mahesh2710.github.io/ARData/video/Gujhiya.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0" video-handler="videoElement: #video1">
-        <a-video src="#video1" width="1" height="0.55" position="0 0 0" rotation="0 0 0"></a-video>
+      <a-entity mindar-image-target="targetIndex: 0" video-handler="target: #blinkitVideo">
+        <a-video src="#blinkitVideo" width="1" height="1" position="0 0 0"></a-video>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 1" video-handler="videoElement: #video2">
-        <a-video src="#video2" width="1" height="0.55" position="0 0 0" rotation="0 0 0"></a-video>
+      <a-entity mindar-image-target="targetIndex: 1" video-handler="target: #haldiramVideo">
+        <a-video src="#haldiramVideo" width="1" height="1" position="0 0 0"></a-video>
       </a-entity>
 
     </a-scene>
