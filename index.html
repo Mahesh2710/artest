@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,63 +8,88 @@
 
 </head>
 
-<body>
+<body style="margin:0; overflow:hidden;">
+
+<button id="startAR"
+style="position:absolute;z-index:10;top:20px;left:20px;padding:10px;">
+Start AR
+</button>
 
 <a-scene
   mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind;"
   embedded
-  vr-mode-ui="enabled:false">
+  vr-mode-ui="enabled:false"
+  device-orientation-permission-ui="enabled:true">
 
 <a-assets>
 
-  <!-- Videos -->
-  <video id="video0" autoplay muted loop playsinline webkit-playsinline
-    src="https://video-indiatoday.tosshub.com/indiatoday/video/2026_02/15_feb_26_it_10pm_nikhil-chat-gavaskar_on_ind_win_720.mp4">
-  </video>
+<!-- Video -->
+<video
+  id="video0"
+  muted
+  loop
+  playsinline
+  webkit-playsinline
+  crossorigin="anonymous"
+  src="https://video-indiatoday.tosshub.com/indiatoday/video/2026_02/15_feb_26_it_10pm_nikhil-chat-gavaskar_on_ind_win_720.mp4">
+</video>
 
-  <video id="video1" autoplay muted loop playsinline webkit-playsinline
-    src="https://video-indiatoday.tosshub.com/indiatoday/video/2026_02/16_feb_26_rijiju_1771216926027_720.mp4">
-  </video>
+<!-- 3D Model -->
+<a-asset-item
+  id="bearModel"
+  src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/bear/scene.gltf">
+</a-asset-item>
 
 </a-assets>
 
 <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
-<!-- Target 0 -->
 <a-entity id="target0" mindar-image-target="targetIndex:0">
 
-  <a-video
-    src="#video0"
-    width="1"
-    height="0.56"
-    position="0 0 0">
-  </a-video>
+<!-- Video -->
+<a-video
+  src="#video0"
+  width="1.2"
+  height="0.68"
+  position="0 0 0.01">
+</a-video>
 
-</a-entity>
-
-<!-- Target 1 -->
-<a-entity id="target1" mindar-image-target="targetIndex:1">
-
-  <a-video
-    src="#video1"
-    width="1"
-    height="0.56"
-    position="0 0 0">
-  </a-video>
+<!-- 3D Model -->
+<a-gltf-model
+  src="#bearModel"
+  position="0 -0.3 0.2"
+  scale="0.05 0.05 0.05">
+</a-gltf-model>
 
 </a-entity>
 
 </a-scene>
 
 <script>
-const v0 = document.querySelector('#video0');
-const v1 = document.querySelector('#video1');
 
-document.querySelector('#target0').addEventListener("targetFound", () => v0.play());
-document.querySelector('#target0').addEventListener("targetLost", () => v0.pause());
+const scene = document.querySelector('a-scene');
+const video = document.querySelector('#video0');
+const target = document.querySelector('#target0');
+const startBtn = document.querySelector('#startAR');
 
-document.querySelector('#target1').addEventListener("targetFound", () => v1.play());
-document.querySelector('#target1').addEventListener("targetLost", () => v1.pause());
+// Required user gesture
+startBtn.addEventListener('click', async () => {
+  await scene.systems["mindar-image-system"].start();
+  startBtn.style.display = 'none';
+});
+
+// Play / pause based on target
+target.addEventListener("targetFound", () => {
+  video.play();
+});
+
+target.addEventListener("targetLost", () => {
+  video.pause();
+});
+
+// iOS fallback
+document.body.addEventListener('click', () => video.play(), { once:true });
+
 </script>
 
 </body>
