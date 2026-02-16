@@ -1,88 +1,32 @@
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <style>
-      /* Hidden by default until first scan */
-      #video-container {
-        display: none;
-        position: fixed;
-        overflow: hidden;
-      }
+<head>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+</head>
 
-      /* State: Locked to Poster */
-      #video-container.ar-mode {
-        display: block;
-        position: absolute;
-        width: 300px;
-        height: 169px;
-        z-index: 10;
-        /* Note: For real perspective tilting, 
-           MindAR's CSS renderer is usually used */
-      }
+<body>
 
-      /* State: Full Screen */
-      #video-container.full-screen {
-        display: block;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        z-index: 999;
-        background: black;
-      }
+<button id="startAR">Start AR</button>
 
-      iframe { border: none; width: 100%; height: 100%; }
-      
-      #scan-prompt {
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        color: white; font-family: sans-serif; text-align: center;
-        background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px;
-      }
-    </style>
-  </head>
-  <body>
+<a-scene
+  mindar-image="imageTargetSrc: ./aajtak.mind;"
+  embedded
+  vr-mode-ui="enabled:false"
+  device-orientation-permission-ui="enabled:true">
 
-    <div id="scan-prompt">
-      <p>Point your camera at the poster<br>to start the news</p>
-    </div>
+  <a-camera position="0 0 0"></a-camera>
 
-    <div id="video-container">
-      <iframe id="player" 
-        src="https://www.youtube.com/embed/M0TWfl2gK3E?enablejsapi=1&autoplay=1&mute=1" 
-        allow="autoplay">
-      </iframe>
-    </div>
+  <a-entity mindar-image-target="targetIndex:0">
+    <a-box color="red"></a-box>
+  </a-entity>
 
-    <a-scene mindar-image="imageTargetSrc: ./aajtak.mind;" vr-mode-ui="enabled: false">
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-      <a-entity id="my-target" mindar-image-target="targetIndex: 0"></a-entity>
-    </a-scene>
+</a-scene>
 
-    <script>
-      const container = document.querySelector('#video-container');
-      const target = document.querySelector('#my-target');
-      const prompt = document.querySelector('#scan-prompt');
-      let hasBeenScanned = false;
+<script>
+document.querySelector('#startAR').onclick = async () => {
+  const scene = document.querySelector('a-scene');
+  await scene.systems["mindar-image-system"].start();
+};
+</script>
 
-      target.addEventListener("targetFound", () => {
-        hasBeenScanned = true;
-        prompt.style.display = "none"; // Remove prompt forever
-        
-        container.classList.remove('full-screen');
-        container.classList.add('ar-mode');
-        
-        // Ensure video is playing
-        const iframe = document.querySelector('#player');
-        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-      });
-
-      target.addEventListener("targetLost", () => {
-        // Only jump to full screen if we have scanned at least once
-        if (hasBeenScanned) {
-          container.classList.remove('ar-mode');
-          container.classList.add('full-screen');
-        }
-      });
-    </script>
-  </body>
+</body>
 </html>
