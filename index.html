@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -6,42 +7,48 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
+      /* Keep source videos invisible but available for fullscreen */
+      video {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Native Fullscreen visibility fix */
+      video:fullscreen { opacity: 1; width: 100%; height: 100%; }
+      video:-webkit-full-screen { opacity: 1; width: 100%; height: 100%; }
+
       #overlay {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0,0,0,0.9);
         z-index: 9999;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         color: white;
-        font-family: sans-serif;
+        font-family: Arial, sans-serif;
+        text-align: center;
       }
       #startButton {
-        padding: 15px 35px;
-        font-size: 18px;
+        padding: 15px 40px;
+        margin-top: 20px;
+        font-size: 20px;
         background: #f1c40f;
         border: none;
         border-radius: 50px;
+        color: black;
         font-weight: bold;
         cursor: pointer;
-      }
-      video {
-        opacity: 0;
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        pointer-events: none;
-      }
-      video:fullscreen, video:-webkit-full-screen {
-        opacity: 1;
-        width: 100%;
-        height: 100%;
+        box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
       }
     </style>
 
     <script>
+      // Safari Audio/Video Unlock
       window.addEventListener('load', () => {
         const startButton = document.querySelector("#startButton");
         const overlay = document.querySelector("#overlay");
@@ -50,6 +57,7 @@
 
         startButton.addEventListener('click', () => {
           overlay.style.display = "none";
+          // Prime videos for Safari/iOS
           v1.play().then(() => v1.pause());
           v2.play().then(() => v2.pause());
         });
@@ -59,7 +67,9 @@
         schema: { target: {type: 'selector'} },
         init: function () {
           const video = this.data.target;
+          
           this.el.addEventListener('targetFound', () => {
+            // Exit Fullscreen if returning to AR
             if (document.fullscreenElement || document.webkitFullscreenElement) {
               if (document.exitFullscreen) document.exitFullscreen();
               else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -67,11 +77,15 @@
             video.style.opacity = "0";
             video.play();
           });
+
           this.el.addEventListener('targetLost', () => {
             if (!video.paused) {
-              video.style.opacity = "1";
-              if (video.requestFullscreen) video.requestFullscreen();
-              else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+              video.style.opacity = "1"; // Show for fullscreen
+              if (video.requestFullscreen) {
+                video.requestFullscreen();
+              } else if (video.webkitRequestFullscreen) {
+                video.webkitRequestFullscreen();
+              }
             }
           });
         }
@@ -80,13 +94,15 @@
   </head>
   <body>
     <div id="overlay">
-      <p>Vertical AR Experience Ready</p>
-      <button id="startButton">START CAMERA</button>
+      <p style="padding: 0 20px;">AR Experience Ready</p>
+      <button id="startButton">START EXPERIENCE</button>
     </div>
 
     <a-scene 
       mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/combined.mind; maxTrack: 3" 
-      vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false"
+      renderer="antialias: true; colorManagement: true; precision: medium;">
       
       <a-assets>
         <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
@@ -101,13 +117,25 @@
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 0" video-handler="target: #blinkitVideo">
-        <a-video src="#blinkitVideo" width="1.2" height="2.1" position="0 0 0.1"></a-video>
+        <a-video 
+          src="#blinkitVideo" 
+          width="1.2" 
+          height="2.1" 
+          position="0 0 0.2"
+          material="side: double; transparent: true; alphaTest: 0.5">
+        </a-video>
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 1" video-handler="target: #haldiramVideo">
-        <a-video src="#haldiramVideo" width="1.2" height="2.1" position="0 0 0.1"></a-video>
+        <a-video 
+          src="#haldiramVideo" 
+          width="1.2" 
+          height="2.1" 
+          position="0 0 0.2"
+          material="side: double; transparent: true; alphaTest: 0.5">
+        </a-video>
       </a-entity>
-
+      
     </a-scene>
   </body>
 </html>
