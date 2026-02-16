@@ -6,7 +6,6 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      /* The Safari Overlay */
       #overlay {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
@@ -28,12 +27,11 @@
         font-weight: bold;
         cursor: pointer;
       }
-      /* Ensure videos are technically visible for fullscreen handoff */
       video {
         opacity: 0;
         position: absolute;
-        width: 1.15px;
-        height: 1.15px;
+        width: 1px;
+        height: 1px;
         pointer-events: none;
       }
       video:fullscreen, video:-webkit-full-screen {
@@ -44,7 +42,6 @@
     </style>
 
     <script>
-      // 1. Safari Unlock Logic
       window.addEventListener('load', () => {
         const startButton = document.querySelector("#startButton");
         const overlay = document.querySelector("#overlay");
@@ -53,36 +50,28 @@
 
         startButton.addEventListener('click', () => {
           overlay.style.display = "none";
-          // We "kickstart" the videos so Safari allows them to be played later via script
           v1.play().then(() => v1.pause());
           v2.play().then(() => v2.pause());
         });
       });
 
-      // 2. AR Component Logic
       AFRAME.registerComponent('video-handler', {
         schema: { target: {type: 'selector'} },
         init: function () {
           const video = this.data.target;
-          
           this.el.addEventListener('targetFound', () => {
-            // Exit fullscreen if returning from "Lost" state
             if (document.fullscreenElement || document.webkitFullscreenElement) {
               if (document.exitFullscreen) document.exitFullscreen();
               else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
             }
-            video.style.opacity = "0"; // Hide the raw element, show AR plane
+            video.style.opacity = "0";
             video.play();
           });
-
           this.el.addEventListener('targetLost', () => {
             if (!video.paused) {
-              video.style.opacity = "1"; // Show the raw element for fullscreen
-              if (video.requestFullscreen) {
-                video.requestFullscreen();
-              } else if (video.webkitRequestFullscreen) {
-                video.webkitRequestFullscreen(); // iOS Safari specific
-              }
+              video.style.opacity = "1";
+              if (video.requestFullscreen) video.requestFullscreen();
+              else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
             }
           });
         }
@@ -91,7 +80,7 @@
   </head>
   <body>
     <div id="overlay">
-      <p>AR Experience Ready</p>
+      <p>Vertical AR Experience Ready</p>
       <button id="startButton">START CAMERA</button>
     </div>
 
@@ -112,12 +101,13 @@
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 0" video-handler="target: #blinkitVideo">
-        <a-video src="#blinkitVideo" width="1.15" height="1.15" position="0 0 0.05"></a-video>
+        <a-video src="#blinkitVideo" width="1.2" height="2.1" position="0 0 0.1"></a-video>
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 1" video-handler="target: #haldiramVideo">
-        <a-video src="#haldiramVideo" width="1.15" height="1.15" position="0 0 0.05"></a-video>
+        <a-video src="#haldiramVideo" width="1.2" height="2.1" position="0 0 0.1"></a-video>
       </a-entity>
+
     </a-scene>
   </body>
 </html>
