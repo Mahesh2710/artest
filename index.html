@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -6,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      /* Hide the source videos from the UI but keep them 'visible' for the browser */
+      /* Keep source videos invisible but available for fullscreen */
       video {
         position: absolute;
         width: 1px;
@@ -15,7 +16,7 @@
         pointer-events: none;
       }
 
-      /* Native Fullscreen styling */
+      /* Native Fullscreen visibility fix */
       video:fullscreen { opacity: 1; width: 100%; height: 100%; }
       video:-webkit-full-screen { opacity: 1; width: 100%; height: 100%; }
 
@@ -30,9 +31,11 @@
         align-items: center;
         color: white;
         font-family: Arial, sans-serif;
+        text-align: center;
       }
       #startButton {
         padding: 15px 40px;
+        margin-top: 20px;
         font-size: 20px;
         background: #f1c40f;
         border: none;
@@ -45,7 +48,7 @@
     </style>
 
     <script>
-      // Unlock audio/video for Safari on first click
+      // Safari Audio/Video Unlock
       window.addEventListener('load', () => {
         const startButton = document.querySelector("#startButton");
         const overlay = document.querySelector("#overlay");
@@ -54,7 +57,7 @@
 
         startButton.addEventListener('click', () => {
           overlay.style.display = "none";
-          // Priming the videos for Safari
+          // Prime videos for Safari
           v1.play(); v1.pause();
           v2.play(); v2.pause();
         });
@@ -71,15 +74,13 @@
               if (document.exitFullscreen) document.exitFullscreen();
               else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
             }
-            // Hide the raw background video element
             video.style.opacity = "0";
             video.play();
           });
 
           this.el.addEventListener('targetLost', () => {
             if (!video.paused) {
-              // Make video visible so fullscreen isn't black
-              video.style.opacity = "1";
+              video.style.opacity = "1"; // Show for fullscreen
               if (video.requestFullscreen) {
                 video.requestFullscreen();
               } else if (video.webkitRequestFullscreen) {
@@ -93,8 +94,8 @@
   </head>
   <body>
     <div id="overlay">
-      <p>Scan the targets to begin</p>
-      <button id="startButton">START AR</button>
+      <p style="padding: 0 20px;">Point your camera at the logo<br>to play the video</p>
+      <button id="startButton">START EXPERIENCE</button>
     </div>
 
     <a-scene 
@@ -115,12 +116,13 @@
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 1" video-handler="target: #blinkitVideo">
-        <a-video src="#blinkitVideo" width="0.56" height="1" position="0 0 0.1" rotation="0 0 0"></a-video>
+        <a-video src="#blinkitVideo" width="1" height="1" position="0 0 0.01"></a-video>
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 0" video-handler="target: #haldiramVideo">
-        <a-video src="#haldiramVideo" width="0.56" height="1" position="0 0 0.1" rotation="0 0 0"></a-video>
+        <a-video src="#haldiramVideo" width="1" height="1" position="0 0 0.01"></a-video>
       </a-entity>
+      
     </a-scene>
   </body>
 </html>
