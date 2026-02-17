@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blinkit AR - Final Fixed Logic</title>
+    <title>Blinkit AR - Absolute Fix</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -85,13 +85,13 @@
         vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         
         <a-assets>
-            <video id="myVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+            <video id="myVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="metadata"></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-            <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0" font="https://cdn.aframe.io/fonts/Aileron-Semibold.fnt"></a-text>
+            <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0"></a-text>
             <a-video id="ar-video-renderer" src="#myVideo" width="1.2" height="2.1" position="0 0 0"></a-video>
         </a-entity>
     </a-scene>
@@ -108,64 +108,64 @@
         const closeStickyBtn = document.querySelector('#close-sticky');
 
         let canSticky = true; 
-        let isStickyActive = false;
         let hasFoundOnce = false;
+
+        // Ensure video is PAUSED on initial load
+        video.pause();
+        video.currentTime = 0;
 
         // 1. Initial Start Button
         document.querySelector('#play-button').addEventListener('click', () => {
             welcomePage.style.display = 'none';
             scannerUi.style.display = 'flex';
             
-            // "Prime" the video so it's allowed to play later, but don't play yet
+            // WE DO NOT PLAY THE VIDEO HERE ANYMORE.
+            // We only "unlock" it for the browser's permission.
             video.load(); 
+            video.pause(); // Force it to remain paused
             
             sceneEl.systems["mindar-image-system"].start(); 
         });
 
-        // 2. Target Found
+        // 2. Target Found - THIS IS THE ONLY PLACE IT PLAYS
         targetEntity.addEventListener('targetFound', () => {
-            console.log("Target Found");
             hasFoundOnce = true;
-            isStickyActive = false;
-            canSticky = true; // Reset sticky permission when target is found again
+            canSticky = true; 
 
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none';
             buyNowBtn.style.display = 'block'; 
             arVideoRenderer.setAttribute('visible', 'true');
             
-            // Ensure video is in the correct place and playing
             document.querySelector('a-assets').appendChild(video);
-            video.play();
+            
+            // Set volume to 1 and play
+            video.muted = false;
+            video.play().catch(e => console.log("Playback error:", e));
         });
 
         // 3. Target Lost
         targetEntity.addEventListener('targetLost', () => {
-            console.log("Target Lost");
-            if (canSticky && !isStickyActive && hasFoundOnce) {
-                isStickyActive = true;
+            if (canSticky && hasFoundOnce) {
                 arVideoRenderer.setAttribute('visible', 'false');
                 videoContainer.style.display = 'flex';
                 videoContainer.appendChild(video);
                 video.play();
-            } else if (!canSticky) {
-                // If the user closed the sticky video, we pause everything
+            } else {
                 video.pause();
             }
         });
 
         // 4. Close Sticky Button
-        closeStickyBtn.addEventListener('click', () => {
+        closeStickyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             canSticky = false; 
-            isStickyActive = false;
             
             video.pause();
-            video.currentTime = 0; // Reset video to start
+            video.currentTime = 0; 
             
             videoContainer.style.display = 'none';
             scannerUi.style.display = 'flex';
-            
-            // Move video back to hidden assets
             document.querySelector('a-assets').appendChild(video);
         });
     </script>
