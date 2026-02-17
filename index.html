@@ -96,12 +96,31 @@
 
 
         /* BUY NOW CTA */
+      /* BUY NOW CTA - Updated with Background Image */
         #buy-now-cta {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 80%; padding: 15px; background: #f1c40f;
-            color: black; text-align: center; font-weight: bold; font-size: 1.2rem;
-            text-decoration: none; border-radius: 50px; z-index: 60;
-            display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 80%; 
+            padding: 15px; 
+            
+            /* --- Background Image Changes --- */
+            background-image: url('https://github.com/Mahesh2710/ARData/blob/main/target/blinkit-buy-now.png'); 
+            background-size: cover;
+            background-position: center;
+            /* -------------------------------- */
+
+            color: white; /* Changed to white for better contrast on images */
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 0rem;
+            text-decoration: none; 
+            border-radius: 50px; 
+            z-index: 60;
+            display: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            overflow: hidden; /* Ensures image doesn't bleed past rounded corners */
         }
     </style>
 </head>
