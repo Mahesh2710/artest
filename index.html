@@ -130,7 +130,6 @@
         // 2. Target Found - THIS IS THE ONLY PLACE IT PLAYS
         targetEntity.addEventListener('targetFound', () => {
             hasFoundOnce = true;
-            canSticky = true; 
 
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none';
@@ -168,6 +167,7 @@
             videoContainer.style.display = 'none';
             scannerUi.style.display = 'flex';
             document.querySelector('a-assets').appendChild(video);
+             console.log("canSticky on close",canSticky);
         });
     </script>
 </body>
