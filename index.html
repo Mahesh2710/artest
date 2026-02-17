@@ -146,6 +146,7 @@
 
         // 3. Target Lost
         targetEntity.addEventListener('targetLost', () => {
+            console.log("canSticky",canSticky);
             if (canSticky && hasFoundOnce) {
                 arVideoRenderer.setAttribute('visible', 'false');
                 videoContainer.style.display = 'flex';
