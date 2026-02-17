@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blinkit AR - Premium Experience</title>
+    <title>Blinkit AR - Final Logic</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -22,6 +22,7 @@
         #play-button {
             width: 90px; height: 90px; background: #f1c40f; border: none; border-radius: 50%;
             cursor: pointer; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         .play-triangle { border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 30px solid white; margin-left: 8px; }
@@ -57,7 +58,7 @@
             width: 80%; padding: 15px; background: #f1c40f;
             color: black; text-align: center; font-weight: bold; font-size: 1.2rem;
             text-decoration: none; border-radius: 10px; z-index: 60;
-            display: none; /* Shows after first detection */
+            display: none; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
     </style>
@@ -66,7 +67,7 @@
 
     <div id="welcome-page">
         <button id="play-button"><div class="play-triangle"></div></button>
-        <div style="color:white; margin-top:15px; font-weight:bold;">START AR</div>
+        <div style="color:white; margin-top:15px; font-weight:bold;">START EXPERIENCE</div>
     </div>
 
     <div id="scanner-ui">
@@ -91,8 +92,7 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-            <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0" font="https://cdn.aframe.io/fonts/Aileron-Semibold.fnt"></a-text>
-            
+            <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0"></a-text>
             <a-video id="ar-video-renderer" src="#myVideo" width="1.2" height="2.1" position="0 0 0"></a-video>
         </a-entity>
     </a-scene>
@@ -108,43 +108,46 @@
         const arVideoRenderer = document.querySelector('#ar-video-renderer');
         const closeStickyBtn = document.querySelector('#close-sticky');
 
-        let canSticky = true; // Will be set to false once 'X' is clicked
-        let isStickyActive = false;
+        let stickyDismissed = false; 
 
+        // 1. Initial Start (Camera Only, NO VIDEO YET)
         document.querySelector('#play-button').addEventListener('click', () => {
             welcomePage.style.display = 'none';
             scannerUi.style.display = 'flex';
-            video.play();
             sceneEl.systems["mindar-image-system"].start(); 
         });
 
+        // 2. Target Found (Video Starts Now)
         targetEntity.addEventListener('targetFound', () => {
-            isStickyActive = false;
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none';
-            buyNowBtn.style.display = 'block'; // Permanent show after first find
+            buyNowBtn.style.display = 'block'; 
             arVideoRenderer.setAttribute('visible', 'true');
             
+            // Return video to AR assets
             document.querySelector('a-assets').appendChild(video);
-            video.play();
+            video.play(); // Video only starts when target is found
         });
 
+        // 3. Target Lost
         targetEntity.addEventListener('targetLost', () => {
-            // Only go sticky if the feature hasn't been closed by the user
-            if (canSticky && !isStickyActive) {
-                isStickyActive = true;
+            if (!stickyDismissed) {
+                // Show sticky full-screen video
                 arVideoRenderer.setAttribute('visible', 'false');
                 videoContainer.style.display = 'flex';
                 videoContainer.appendChild(video);
+            } else {
+                // Video stays playing in background (audio), no visual scanner box
+                console.log("Sticky dismissed, video playing in background");
             }
         });
 
+        // 4. Close Sticky Logic
         closeStickyBtn.addEventListener('click', () => {
-            canSticky = false; // DISABLE STICKY FOREVER
-            isStickyActive = false;
+            stickyDismissed = true; // Dismiss the sticky visual forever
             videoContainer.style.display = 'none';
-            scannerUi.style.display = 'flex';
-            video.pause();
+            scannerUi.style.display = 'none'; // Keep scanner box hidden per your request
+            // Video keeps playing (audio) as you requested "it should play on target loose"
         });
     </script>
 </body>
