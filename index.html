@@ -23,7 +23,6 @@
         border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
-        box-shadow: 0 4px 15px rgba(241, 196, 15, 0.5);
       }
     </style>
 
@@ -32,23 +31,19 @@
         const startButton = document.querySelector("#startButton");
         const overlay = document.querySelector("#overlay");
         const video = document.querySelector("#myVideo");
-        const scene = document.documentElement; // The whole page
+        const scene = document.documentElement;
 
         startButton.addEventListener('click', () => {
           overlay.style.display = "none";
           
-          // 1. Unlocks Video for Safari
-          video.play().then(() => {
-            video.pause();
-          });
+          // Unlock video for Safari
+          video.play(); 
 
-          // 2. Take Browser to Fullscreen
+          // Go Fullscreen
           if (scene.requestFullscreen) {
             scene.requestFullscreen();
-          } else if (scene.webkitRequestFullscreen) { /* Safari/iOS */
+          } else if (scene.webkitRequestFullscreen) {
             scene.webkitRequestFullscreen();
-          } else if (scene.msRequestFullscreen) {
-            scene.msRequestFullscreen();
           }
         });
       });
@@ -56,11 +51,16 @@
       AFRAME.registerComponent('video-controls', {
         init: function () {
           const video = document.querySelector("#myVideo");
+          
           this.el.addEventListener('targetFound', () => {
+            // Ensure video is playing when found
             video.play();
           });
+
           this.el.addEventListener('targetLost', () => {
-            video.pause();
+            // Logic removed: We no longer call video.pause() here.
+            // The video stays playing even when the target is gone.
+            console.log("Target lost, but video keeps playing...");
           });
         }
       });
@@ -68,7 +68,7 @@
   </head>
   <body>
     <div id="overlay">
-      <button id="startButton">PLAY & START AR</button>
+      <button id="startButton">START EXPERIENCE</button>
     </div>
 
     <a-scene 
@@ -83,7 +83,7 @@
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" video-controls>
-        <a-video src="#myVideo" width="1" height="1.5" position="0 0 0.1"></a-video>
+        <a-video src="#myVideo" width="1.2" height="2.1" position="0 0 0.1"></a-video>
       </a-entity>
     </a-scene>
   </body>
