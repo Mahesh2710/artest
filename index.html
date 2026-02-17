@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blinkit AR - Premium Experience</title>
+    <title>Blinkit AR - Final Fixed Logic</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -46,7 +46,7 @@
 
         #close-sticky {
             position: absolute; top: 20px; right: 20px;
-            width: 45px; height: 45px; background: rgba(0,0,0,0.6);
+            width: 45px; height: 45px; background: rgba(0,0,0,0.8);
             color: white; border: 2px solid #f1c40f; border-radius: 50%;
             font-size: 28px; cursor: pointer; z-index: 41;
         }
@@ -57,7 +57,7 @@
             width: 80%; padding: 15px; background: #f1c40f;
             color: black; text-align: center; font-weight: bold; font-size: 1.2rem;
             text-decoration: none; border-radius: 10px; z-index: 60;
-            display: none; /* Shows after first detection */
+            display: none; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
     </style>
@@ -92,7 +92,6 @@
 
         <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
             <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0" font="https://cdn.aframe.io/fonts/Aileron-Semibold.fnt"></a-text>
-            
             <a-video id="ar-video-renderer" src="#myVideo" width="1.2" height="2.1" position="0 0 0"></a-video>
         </a-entity>
     </a-scene>
@@ -108,43 +107,66 @@
         const arVideoRenderer = document.querySelector('#ar-video-renderer');
         const closeStickyBtn = document.querySelector('#close-sticky');
 
-        let canSticky = true; // Will be set to false once 'X' is clicked
+        let canSticky = true; 
         let isStickyActive = false;
+        let hasFoundOnce = false;
 
+        // 1. Initial Start Button
         document.querySelector('#play-button').addEventListener('click', () => {
             welcomePage.style.display = 'none';
             scannerUi.style.display = 'flex';
-            video.play();
+            
+            // "Prime" the video so it's allowed to play later, but don't play yet
+            video.load(); 
+            
             sceneEl.systems["mindar-image-system"].start(); 
         });
 
+        // 2. Target Found
         targetEntity.addEventListener('targetFound', () => {
+            console.log("Target Found");
+            hasFoundOnce = true;
             isStickyActive = false;
+            canSticky = true; // Reset sticky permission when target is found again
+
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none';
-            buyNowBtn.style.display = 'block'; // Permanent show after first find
+            buyNowBtn.style.display = 'block'; 
             arVideoRenderer.setAttribute('visible', 'true');
             
+            // Ensure video is in the correct place and playing
             document.querySelector('a-assets').appendChild(video);
             video.play();
         });
 
+        // 3. Target Lost
         targetEntity.addEventListener('targetLost', () => {
-            // Only go sticky if the feature hasn't been closed by the user
-            if (canSticky && !isStickyActive) {
+            console.log("Target Lost");
+            if (canSticky && !isStickyActive && hasFoundOnce) {
                 isStickyActive = true;
                 arVideoRenderer.setAttribute('visible', 'false');
                 videoContainer.style.display = 'flex';
                 videoContainer.appendChild(video);
+                video.play();
+            } else if (!canSticky) {
+                // If the user closed the sticky video, we pause everything
+                video.pause();
             }
         });
 
+        // 4. Close Sticky Button
         closeStickyBtn.addEventListener('click', () => {
-            canSticky = false; // DISABLE STICKY FOREVER
+            canSticky = false; 
             isStickyActive = false;
+            
+            video.pause();
+            video.currentTime = 0; // Reset video to start
+            
             videoContainer.style.display = 'none';
             scannerUi.style.display = 'flex';
-            video.pause();
+            
+            // Move video back to hidden assets
+            document.querySelector('a-assets').appendChild(video);
         });
     </script>
 </body>
