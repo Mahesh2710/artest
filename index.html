@@ -6,11 +6,10 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      /* Simple overlay to capture user click for Safari */
       #overlay {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.9);
         z-index: 9999;
         display: flex;
         justify-content: center;
@@ -21,23 +20,36 @@
         font-size: 20px;
         background: #f1c40f;
         border: none;
-        border-radius: 10px;
+        border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
+        box-shadow: 0 4px 15px rgba(241, 196, 15, 0.5);
       }
     </style>
 
     <script>
-      // This script runs when the "Start" button is clicked
       window.addEventListener('load', () => {
         const startButton = document.querySelector("#startButton");
         const overlay = document.querySelector("#overlay");
         const video = document.querySelector("#myVideo");
+        const scene = document.documentElement; // The whole page
 
         startButton.addEventListener('click', () => {
-          overlay.style.display = "none"; // Hide overlay
-          video.play();  // Start playing
-          video.pause(); // Immediately pause (this "unlocks" it for Safari)
+          overlay.style.display = "none";
+          
+          // 1. Unlocks Video for Safari
+          video.play().then(() => {
+            video.pause();
+          });
+
+          // 2. Take Browser to Fullscreen
+          if (scene.requestFullscreen) {
+            scene.requestFullscreen();
+          } else if (scene.webkitRequestFullscreen) { /* Safari/iOS */
+            scene.webkitRequestFullscreen();
+          } else if (scene.msRequestFullscreen) {
+            scene.msRequestFullscreen();
+          }
         });
       });
 
@@ -56,7 +68,7 @@
   </head>
   <body>
     <div id="overlay">
-      <button id="startButton">TAP TO START AR</button>
+      <button id="startButton">PLAY & START AR</button>
     </div>
 
     <a-scene 
