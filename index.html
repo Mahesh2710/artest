@@ -60,6 +60,7 @@
           this.el.addEventListener('targetLost', () => {
             // Logic removed: We no longer call video.pause() here.
             // The video stays playing even when the target is gone.
+             video.play();
             console.log("Target lost, but video keeps playing...");
           });
         }
