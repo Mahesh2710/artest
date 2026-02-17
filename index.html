@@ -1,150 +1,165 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Blinkit AR Experience</title>
+    
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
 
-      /* Full-screen Background Overlay */
-      #overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        /* Change this URL to your desired background image */
-        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                    url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg'); 
-        background-size: cover;
-        background-position: center;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        text-align: center;
-      }
-
-      /* Circular Play Button */
-      #startButton {
-        width: 90px;
-        height: 90px;
-        background: #f1c40f; /* Blinkit Yellow */
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        transition: transform 0.2s ease-in-out;
-      }
-
-      #startButton:active {
-        transform: scale(0.9);
-      }
-
-      /* CSS Play Triangle */
-      .play-icon {
-        width: 0; 
-        height: 0; 
-        border-top: 20px solid transparent;
-        border-bottom: 20px solid transparent;
-        border-left: 30px solid white;
-        margin-left: 8px; /* Optical centering */
-      }
-
-      #instruction {
-        margin-top: 25px;
-        font-size: 1.1rem;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        font-weight: bold;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-      }
-    </style>
-
-    <script>
-      // Component to handle video playback based on tracking
-      AFRAME.registerComponent('video-handler', {
-        init: function () {
-          const video = document.querySelector("#myVideo");
-          
-          this.el.addEventListener('targetFound', () => {
-            console.log("Blinkit Target Found");
-            video.play();
-          });
-
-          this.el.addEventListener('targetLost', () => {
-            console.log("Blinkit Target Lost");
-            // Video continues playing (audio persists) as per your preference
-          });
+        /* --- PAGE 1: WELCOME PAGE --- */
+        #welcome-page {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Stays on top */
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg'); 
+            background-size: cover;
+            background-position: center;
+            transition: opacity 0.8s ease; /* Fade out effect */
         }
-      });
 
-      window.addEventListener('load', () => {
-        const startButton = document.querySelector("#startButton");
-        const overlay = document.querySelector("#overlay");
-        const video = document.querySelector("#myVideo");
+        #play-button {
+            width: 100px;
+            height: 100px;
+            background: #f1c40f; /* Blinkit Yellow */
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
 
-        startButton.addEventListener('click', () => {
-          // 1. Hide the entry screen
-          overlay.style.display = "none";
-          
-          // 2. Browser requirement: Video must be triggered by user click
-          video.play(); 
-          
-          // 3. Attempt Fullscreen for better AR immersion
-          const scene = document.documentElement;
-          if (scene.requestFullscreen) {
-            scene.requestFullscreen();
-          } else if (scene.webkitRequestFullscreen) {
-            scene.webkitRequestFullscreen();
-          }
-        });
-      });
-    </script>
-  </head>
-  <body>
+        #play-button:active { transform: scale(0.9); }
 
-    <div id="overlay">
-      <button id="startButton">
-        <div class="play-icon"></div>
-      </button>
-      <div id="instruction">Tap to Start AR</div>
+        .play-triangle {
+            width: 0; height: 0; 
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-left: 30px solid white;
+            margin-left: 8px;
+        }
+
+        #welcome-text {
+            color: white;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+        }
+
+        /* --- PAGE 2: AR PAGE --- */
+        #ar-page {
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* Hidden initially */
+            visibility: hidden;
+            transition: opacity 1s ease;
+        }
+
+        #ar-page.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Custom Scanning Overlay (MindAR Default UI can be messy) */
+        .scanning-guide {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vw; height: 70vw;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-page">
+        <button id="play-button">
+            <div class="play-triangle"></div>
+        </button>
+        <div id="welcome-text">Start Experience</div>
     </div>
 
-    <a-scene 
-      mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/blinkit.mind; maxTrack: 1; filterMinCF:0.001; filterBeta: 0.01;" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
-      
-      <a-assets>
-        <video 
-          id="myVideo" 
-          src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" 
-          preload="auto" 
-          loop="true" 
-          crossorigin="anonymous" 
-          playsinline 
-          webkit-playsinline>
-        </video>
-      </a-assets>
+    <div id="ar-page">
+        <div class="scanning-guide"></div>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-scene 
+            mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/blinkit.mind; autoStart: false; maxTrack: 1; filterMinCF:0.001; filterBeta: 0.01;" 
+            vr-mode-ui="enabled: false" 
+            device-orientation-permission-ui="enabled: false">
+            
+            <a-assets>
+                <video id="myVideo" 
+                       src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" 
+                       preload="auto" loop="true" crossorigin="anonymous" 
+                       playsinline webkit-playsinline>
+                </video>
+            </a-assets>
 
-      <a-entity mindar-image-target="targetIndex: 0" video-handler>
-        <a-video 
-          src="#myVideo" 
-          width="1.2" 
-          height="2.1" 
-          position="0 0 0" 
-          rotation="0 0 0">
-        </a-video>
-      </a-entity>
-      
-    </a-scene>
-  </body>
+            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+            <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
+                <a-video src="#myVideo" width="1.2" height="2.1" position="0 0 0"></a-video>
+            </a-entity>
+        </a-scene>
+    </div>
+
+    <script>
+        const welcomePage = document.querySelector('#welcome-page');
+        const arPage = document.querySelector('#ar-page');
+        const playButton = document.querySelector('#play-button');
+        const video = document.querySelector('#myVideo');
+        const sceneEl = document.querySelector('a-scene');
+
+        playButton.addEventListener('click', () => {
+            // 1. Fade out Welcome Page
+            welcomePage.style.opacity = '0';
+            
+            // 2. Show AR Page
+            arPage.classList.add('active');
+
+            // 3. Unlock Video (Safari requirement)
+            video.play();
+            
+            // 4. Start the AR Engine manually (better performance)
+            const arSystem = sceneEl.systems["mindar-image-system"];
+            arSystem.start(); 
+
+            // 5. Cleanup Welcome Page after fade
+            setTimeout(() => {
+                welcomePage.style.display = 'none';
+            }, 800);
+        });
+
+        // Handle Video Play/Pause based on Target Detection
+        const targetEntity = document.querySelector('#target-entity');
+        targetEntity.addEventListener('targetFound', () => {
+            console.log("Target Found");
+            video.play();
+        });
+
+        targetEntity.addEventListener('targetLost', () => {
+            console.log("Target Lost");
+            // Video keeps playing as per your last request
+        });
+    </script>
+</body>
 </html>
