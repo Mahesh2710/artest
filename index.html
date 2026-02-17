@@ -24,20 +24,6 @@
         cursor: pointer;
         font-weight: bold;
       }
-      /* Keep the background video hidden until fullscreen is needed */
-      #myVideo {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        opacity: 0;
-        pointer-events: none;
-      }
-      /* Ensure it becomes visible when the browser forces fullscreen */
-      #myVideo:fullscreen, #myVideo:-webkit-full-screen {
-        opacity: 1;
-        width: 100%;
-        height: 100%;
-      }
     </style>
 
     <script>
@@ -45,37 +31,35 @@
         const startButton = document.querySelector("#startButton");
         const overlay = document.querySelector("#overlay");
         const video = document.querySelector("#myVideo");
+        const scene = document.documentElement;
 
         startButton.addEventListener('click', () => {
           overlay.style.display = "none";
-          // "Unlock" video for Safari
-          video.play().then(() => video.pause());
+          
+          // Unlock video for Safari
+          video.play(); 
+
+          // Go Fullscreen
+          if (scene.requestFullscreen) {
+            scene.requestFullscreen();
+          } else if (scene.webkitRequestFullscreen) {
+            scene.webkitRequestFullscreen();
+          }
         });
       });
 
-      AFRAME.registerComponent('video-handler', {
+      AFRAME.registerComponent('video-controls', {
         init: function () {
           const video = document.querySelector("#myVideo");
           
           this.el.addEventListener('targetFound', () => {
-            // Exit fullscreen if returning to AR
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-              if (document.exitFullscreen) document.exitFullscreen();
-              else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
-            video.style.opacity = "0"; // Hide background element
+            // Ensure video is playing when found
             video.play();
           });
 
           this.el.addEventListener('targetLost', () => {
-            if (!video.paused) {
-              video.style.opacity = "1"; // Show for fullscreen player
-              if (video.requestFullscreen) {
-                video.requestFullscreen();
-              } else if (video.webkitRequestFullscreen) {
-                video.webkitRequestFullscreen(); // iOS specific
-              }
-            }
+             video.pause();
+            console.log("Target lost, but video keeps playing...");
           });
         }
       });
@@ -83,7 +67,7 @@
   </head>
   <body>
     <div id="overlay">
-      <button id="startButton">START AR</button>
+      <button id="startButton">START EXPERIENCE</button>
     </div>
 
     <a-scene 
@@ -97,7 +81,7 @@
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0" video-handler>
+      <a-entity mindar-image-target="targetIndex: 0" video-controls>
         <a-video src="#myVideo" width="1.2" height="2.1" position="0 0 0.1"></a-video>
       </a-entity>
     </a-scene>
