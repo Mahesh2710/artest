@@ -1,226 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blinkit AR - UI Refined</title>
-    
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blinkit AR - Final UI Update</title>
+    
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
 
-        /* WELCOME SCREEN */
-        #welcome-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: #000 url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg') center/cover;
-            display: flex; align-items: flex-end; 
-        }
+        /* WELCOME SCREEN */
+        #welcome-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; background: #000 url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg') center/cover;
+            display: flex; align-items: flex-end; /* Aligns overlay to bottom */
+        }
 
-        /* SLIDING BOTTOM OVERLAY */
-        #bottom-sheet {
-            position: relative; /* Anchor for the CTA */
-            width: 100%;
-            height: 45%; 
-            border-radius: 30px 30px 0 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Centers the Play Button vertically */
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
-            
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-                        url('https://mahesh2710.github.io/ARData/target/welcome.jpg') center/cover;
+        /* SLIDING BOTTOM OVERLAY */
+        #bottom-sheet {
+            width: 100%;
+            height: 45%; 
+            border-radius: 30px 30px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            
+            /* --- Background Image Update --- */
+            background: linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)), 
+                        url('https://mahesh2710.github.io/ARData/target/welcome.jpg') center/cover;
+            /* ------------------------------- */
 
-            transform: translateY(100%);
-            animation: slideUp 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
+            /* Slide up animation */
+            transform: translateY(100%);
+            animation: slideUp 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
 
-        @keyframes slideUp {
-            to { transform: translateY(0); }
-        }
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
 
-        /* CTA IN TOP RIGHT OF BOTTOM SHEET */
-        #buy-now-cta {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 130px; 
-            height: 45px;
-            background: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/target/blinkit-buy-now.png') no-repeat center;
-            background-size: contain;
-            border: none;
-            z-index: 110;
-            display: block; /* Visible by default on welcome */
-            text-indent: -9999px; /* Hide "BUY NOW" text but keep for SEO/A11y */
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
-        }
+        .overlay-img { width: 70%; max-height: 40%; object-fit: contain; }
 
-        /* PLAY BUTTON */
-        #play-button {
-            width: 90px; height: 90px; background: #f1c40f; border: 4px solid #fff; border-radius: 50%;
-            cursor: pointer; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s ease;
-        }
-        #play-button:active { transform: scale(0.9); }
+        #play-button {
+            width: 85px; height: 85px; background: #f1c40f; border: none; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+        }
+        .play-triangle { border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-left: 28px solid white; margin-left: 8px; }
 
-        .play-triangle { border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 30px solid white; margin-left: 10px; }
+        /* SCANNER UI */
+        #scanner-ui {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 50; pointer-events: none;
+        }
+        .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
+        .scanner-img { width: 70%; opacity: 0.4; filter: brightness(1.2); }
+        .scanner-line { position: absolute; width: 100%; height: 4px; background: #f1c40f; top: 0; animation: scan 2s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* SCANNER UI */
-        #scanner-ui {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; pointer-events: none;
-        }
-        .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
-        .scanner-img { width: 70%; opacity: 0.5; filter: brightness(1.2); }
-        .scanner-line { position: absolute; width: 100%; height: 4px; background: #f1c40f; top: 0; animation: scan 2s linear infinite; box-shadow: 0 0 10px #f1c40f; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        /* STICKY VIDEO LAYER */
+        #video-container {
+            position: fixed; top: 46%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; height: 90%; display: none; z-index: 40; justify-content: center; align-items: center;
+        }
+        #video-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
+        #video-container video { width: 100%; height: auto; border: 4px solid #f1c40f; border-radius: 30px; object-fit: cover; }
 
-        /* STICKY VIDEO LAYER */
-        #video-container {
-            position: fixed; top: 46%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; height: 90%; display: none; z-index: 40; justify-content: center; align-items: center;
-        }
-        #video-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
-        #video-container video { width: 100%; height: auto; border: 4px solid #f1c40f; border-radius: 30px; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #close-sticky {
+            position: absolute; top: -10px; right: -10px; width: 45px; height: 45px; 
+            background: #fc0000; color: white; border: 2px solid #fff; border-radius: 50%;
+            font-size: 30px; font-weight: bold; cursor: pointer; z-index: 45; 
+            display: flex; justify-content: center; align-items: center;
+        }
 
-        #close-sticky {
-            position: absolute; top: -15px; right: -15px; width: 45px; height: 45px; 
-            background: #fc0000; color: white; border: 3px solid #fff; border-radius: 50%;
-            font-size: 30px; font-weight: bold; cursor: pointer; z-index: 45; 
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* REPOSITION CTA FOR AR MODE (After scan) */
-        .ar-mode-cta {
-            position: fixed !important;
-            bottom: 30px !important;
-            top: auto !important;
-            right: auto !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 280px !important;
-            height: 70px !important;
-        }
-    </style>
+        /* BUY NOW CTA - Image Only Mode */
+        #buy-now-cta {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 280px; height: 70px; font-size: 0; color: transparent; /* Hide Text */
+            background: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/target/blinkit-buy-now.png') no-repeat center;
+            background-size: contain; border: none; z-index: 60; display: none;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+        }
+    </style>
 </head>
 <body>
 
-    <div id="welcome-page">
-        <div id="bottom-sheet">
-            <a href="https://blinkit.com" target="_blank" id="buy-now-cta">BUY NOW</a>
-            
-            <div style="text-align: center;">
-                <button id="play-button"><div class="play-triangle"></div></button>
-                <div style="color:#FFFFFF; margin-top:15px; font-weight:bold; font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">TAP TO START</div>
-            </div>
-        </div>
-    </div>
+    <div id="welcome-page">
+        <div id="bottom-sheet">
+            <div style="text-align: center;">
+                <button id="play-button"><div class="play-triangle"></div></button>
+                <div style="color:#FFFFFF; margin-top:12px; font-weight:bold; font-size: 0.9rem;">TAP TO START</div>
+            </div>
+        </div>
+    </div>
 
-    <div id="scanner-ui">
-        <div class="scanner-frame">
-            <img src="https://mahesh2710.github.io/ARData/target/blinkit_scanner.png" class="scanner-img">
-            <div class="scanner-line"></div>
-        </div>
-        <div style="color:white; margin-top:20px; font-weight:bold; text-shadow: 0 2px 4px #000; letter-spacing: 1px;">SCAN THE BLINKIT LOGO</div>
-    </div>
+    <div id="scanner-ui">
+        <div class="scanner-frame">
+            <img src="https://mahesh2710.github.io/ARData/target/blinkit_scanner.png" class="scanner-img">
+        </div>
+        <div style="color:white; margin-top:20px; font-weight:bold; text-shadow: 0 2px 4px #000;">SCAN THIS IMAGE</div>
+    </div>
 
-    <div id="video-container">
-        <div id="video-wrapper">
-            <button id="close-sticky">×</button>
-            </div>
-    </div>
+    <div id="video-container">
+        <div id="video-wrapper">
+            <button id="close-sticky">×</button>
+        </div>
+    </div>
 
-    <a-scene 
-        mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/blinkit.mind; autoStart: false; uiScanning: #none;" 
-        vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-        
-        <a-assets>
-            <video id="myVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="metadata"></video>
-        </a-assets>
+    <a href="https://blinkit.com" target="_blank" id="buy-now-cta">BUY NOW</a>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-scene 
+        mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/blinkit.mind; autoStart: false; uiScanning: #none;" 
+        vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        
+        <a-assets>
+            <video id="myVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="metadata"></video>
+        </a-assets>
 
-        <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-            <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0"></a-text>
-            <a-entity geometry="primitive: plane; width: 1.25; height: 2.15" material="color: #f1c40f" position="0 0 -0.01"></a-entity>
-            <a-video id="ar-video-renderer" src="#myVideo" width="1.2" height="2.1" position="0 0 0"></a-video>
-        </a-entity>
-    </a-scene>
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <script>
-        const welcomePage = document.querySelector('#welcome-page');
-        const scannerUi = document.querySelector('#scanner-ui');
-        const videoContainer = document.querySelector('#video-container');
-        const videoWrapper = document.querySelector('#video-wrapper');
-        const buyNowBtn = document.querySelector('#buy-now-cta');
-        const video = document.querySelector('#myVideo');
-        const sceneEl = document.querySelector('a-scene');
-        const targetEntity = document.querySelector('#target-entity');
-        const arVideoRenderer = document.querySelector('#ar-video-renderer');
-        const closeStickyBtn = document.querySelector('#close-sticky');
+        <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
+            <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0"></a-text>
+            <a-entity geometry="primitive: plane; width: 1.25; height: 2.15" material="color: #f1c40f" position="0 0 -0.01"></a-entity>
+            <a-video id="ar-video-renderer" src="#myVideo" width="1.2" height="2.1" position="0 0 0"></a-video>
+        </a-entity>
+    </a-scene>
 
-        let canSticky = true; 
-        let hasFoundOnce = false;
+    <script>
+        const welcomePage = document.querySelector('#welcome-page');
+        const scannerUi = document.querySelector('#scanner-ui');
+        const videoContainer = document.querySelector('#video-container');
+        const videoWrapper = document.querySelector('#video-wrapper');
+        const buyNowBtn = document.querySelector('#buy-now-cta');
+        const video = document.querySelector('#myVideo');
+        const sceneEl = document.querySelector('a-scene');
+        const targetEntity = document.querySelector('#target-entity');
+        const arVideoRenderer = document.querySelector('#ar-video-renderer');
+        const closeStickyBtn = document.querySelector('#close-sticky');
 
-        video.pause();
+        let canSticky = true; 
+        let hasFoundOnce = false;
 
-        // START BUTTON LOGIC
-        document.querySelector('#play-button').addEventListener('click', () => {
-            welcomePage.style.display = 'none';
-            scannerUi.style.display = 'flex';
-            
-            // Re-hide Buy Now until target is found
-            buyNowBtn.style.display = 'none';
-            buyNowBtn.classList.add('ar-mode-cta'); // Prepare for bottom center position
+        video.pause();
 
-            video.load(); 
-            video.pause();
-            sceneEl.systems["mindar-image-system"].start(); 
-        });
+        document.querySelector('#play-button').addEventListener('click', () => {
+            welcomePage.style.display = 'none';
+            scannerUi.style.display = 'flex';
+            video.load(); 
+            video.pause();
+            sceneEl.systems["mindar-image-system"].start(); 
+        });
 
-        // TARGET FOUND
-        targetEntity.addEventListener('targetFound', () => {
-            hasFoundOnce = true;
-            scannerUi.style.display = 'none';
-            videoContainer.style.display = 'none';
-            
-            // Show CTA at bottom center now
-            buyNowBtn.style.display = 'block'; 
-            
-            arVideoRenderer.setAttribute('visible', 'true');
-            document.querySelector('a-assets').appendChild(video);
-            video.muted = false;
-            video.play().catch(e => console.log(e));
-        });
+        targetEntity.addEventListener('targetFound', () => {
+            hasFoundOnce = true;
+            scannerUi.style.display = 'none';
+            videoContainer.style.display = 'none';
+            buyNowBtn.style.display = 'block'; 
+            arVideoRenderer.setAttribute('visible', 'true');
+            document.querySelector('a-assets').appendChild(video);
+            video.muted = false;
+            video.play().catch(e => console.log(e));
+        });
 
-        // TARGET LOST
-        targetEntity.addEventListener('targetLost', () => {
-            if (canSticky && hasFoundOnce) {
-                arVideoRenderer.setAttribute('visible', 'false');
-                videoContainer.style.display = 'flex';
-                videoWrapper.appendChild(video);
-                video.play();
-            } else {
-                video.pause();
-            }
-        });
+        targetEntity.addEventListener('targetLost', () => {
+            if (canSticky && hasFoundOnce) {
+                arVideoRenderer.setAttribute('visible', 'false');
+                videoContainer.style.display = 'flex';
+                videoWrapper.appendChild(video);
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
 
-        // CLOSE STICKY VIDEO
-        closeStickyBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            canSticky = false; 
-            video.pause();
-            video.currentTime = 0; 
-            videoContainer.style.display = 'none';
-            scannerUi.style.display = 'flex';
-            document.querySelector('a-assets').appendChild(video);
-        });
-    </script>
+        closeStickyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            canSticky = false; 
+            video.pause();
+            video.currentTime = 0; 
+            videoContainer.style.display = 'none';
+            scannerUi.style.display = 'flex';
+            document.querySelector('a-assets').appendChild(video);
+        });
+    </script>
 </body>
 </html>
