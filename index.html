@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blinkit AR - Premium UI</title>
+    <title>AR Experience</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -192,6 +192,7 @@
 
         document.querySelector('#target-entity').addEventListener('targetFound', () => {
             hasFoundOnce = true;
+            isStickyEnabled = true;
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none'; // Hide sticky if returning to AR
             buyNowBtn.style.display = 'block';
