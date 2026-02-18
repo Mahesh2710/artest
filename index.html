@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blinkit AR - Final UI Update</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Blinkit AR Experience</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #000; }
+
+        /* FORCE HIDE AFRAME VR/AR BUTTONS */
+        .a-enter-vr, .a-enter-ar, .a-orientation-modal {
+            display: none !important;
+        }
 
         /* WELCOME SCREEN */
         #welcome-page {
@@ -18,7 +23,6 @@
             display: flex; align-items: flex-end;
         }
 
-        /* SLIDING BOTTOM OVERLAY */
         #bottom-sheet {
             width: 100%;
             height: 40%; 
@@ -36,31 +40,27 @@
 
         @keyframes slideUp { to { transform: translateY(0); } }
 
-        /* BLUE OVAL PLAY BUTTON */
         #play-button {
             width: 130px;
             height: 60px;
-            background: #007bff; /* Vibrant Blue */
+            background: #007bff;
             border: 3px solid #ffffff;
-            border-radius: 50px; /* Oval Shape */
+            border-radius: 50px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-left: 200px;
+            margin: auto; /* Centered for better mobile UX */
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             transition: all 0.3s ease;
             animation: pulse 2s infinite;
         }
-
-        #play-button:active { transform: scale(0.92); }
 
         #play-button span {
             color: white;
             font-size: 1.4rem;
             font-weight: 900;
             letter-spacing: 2px;
-            text-transform: uppercase;
         }
 
         @keyframes pulse {
@@ -76,32 +76,32 @@
             z-index: 50; pointer-events: none;
         }
         .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
-        .scanner-img { width: 70%; opacity: 0.4; filter: brightness(1.2); }
+        .scanner-img { width: 70%; opacity: 0.4; }
         .scanner-line { position: absolute; width: 100%; height: 4px; background: #f1c40f; top: 0; animation: scan 2s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* STICKY VIDEO LAYER */
+        /* STICKY VIDEO LAYER (When target lost) */
         #video-container {
             position: fixed; top: 46%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; height: 90%; display: none; z-index: 40; justify-content: center; align-items: center;
+            width: 90%; height: auto; display: none; z-index: 40; justify-content: center; align-items: center;
         }
         #video-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
-        #video-container video { width: 100%; height: auto; border: 4px solid #f1c40f; border-radius: 30px; object-fit: cover; }
+        #video-container video { width: 100%; height: auto; border: 4px solid #f1c40f; border-radius: 20px; object-fit: contain; }
 
         #close-sticky {
-            position: absolute; top: -10px; right: -10px; width: 45px; height: 45px; 
+            position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; 
             background: #fc0000; color: white; border: 2px solid #fff; border-radius: 50%;
-            font-size: 30px; font-weight: bold; cursor: pointer; z-index: 45; 
+            font-size: 24px; font-weight: bold; cursor: pointer; z-index: 45; 
             display: flex; justify-content: center; align-items: center;
         }
 
         /* BUY NOW CTA */
         #buy-now-cta {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 280px; height: 70px; font-size: 0; color: transparent;
+            width: 250px; height: 60px; font-size: 0; color: transparent;
             background: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/target/blinkit-buy-now.png') no-repeat center;
-            background-size: contain; border: none; z-index: 60; display: none;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+            background-size: contain; border: none; z-index: 99; display: none;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
         }
     </style>
 </head>
@@ -133,13 +133,15 @@
 
     <a-scene 
         mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/blinkit.mind; autoStart: false; uiScanning: #none;" 
-        vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        vr-mode-ui="enabled: false" 
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false">
         
         <a-assets>
             <video id="myVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="metadata"></video>
         </a-assets>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
             <a-text value="BLINKIT" align="center" color="#f1c40f" width="4" position="0 1.2 0"></a-text>
@@ -163,27 +165,29 @@
         let canSticky = true; 
         let hasFoundOnce = false;
 
-        video.pause();
-
+        // Start Logic
         document.querySelector('#play-button').addEventListener('click', () => {
             welcomePage.style.display = 'none';
             scannerUi.style.display = 'flex';
-            video.load(); 
-            video.pause();
+            video.play().then(() => video.pause()); // Unlock video for mobile
             sceneEl.systems["mindar-image-system"].start(); 
         });
 
+        // Target Found Logic
         targetEntity.addEventListener('targetFound', () => {
             hasFoundOnce = true;
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none';
             buyNowBtn.style.display = 'block'; 
             arVideoRenderer.setAttribute('visible', 'true');
+            
+            // Return video to AR assets if it was in the sticky container
             document.querySelector('a-assets').appendChild(video);
             video.muted = false;
             video.play().catch(e => console.log(e));
         });
 
+        // Target Lost Logic
         targetEntity.addEventListener('targetLost', () => {
             if (canSticky && hasFoundOnce) {
                 arVideoRenderer.setAttribute('visible', 'false');
@@ -195,6 +199,7 @@
             }
         });
 
+        // Close Sticky Video Logic
         closeStickyBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             canSticky = false; 
