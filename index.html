@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,119 +14,91 @@
         /* WELCOME SCREEN */
         #welcome-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 100; background: #000 url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg') center/cover;
+            display: flex; align-items: flex-end; /* Aligns overlay to bottom */
         }
+
+        /* SLIDING BOTTOM OVERLAY - With Image Background */
+        #bottom-sheet {
+            width: 100%;
+            height: 45%; 
+            border-radius: 30px 30px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            
+            /* --- Background Image Update --- */
+            background: linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)), 
+                        url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg') center/cover;
+            /* ------------------------------- */
+
+            /* Slide up animation */
+            transform: translateY(100%);
+            animation: slideUp 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
+        }
+
+        .overlay-img { width: 70%; max-height: 40%; object-fit: contain; }
 
         #play-button {
-            width: 90px; height: 90px; background: #f1c40f; border: none; border-radius: 50%;
+            width: 85px; height: 85px; background: #f1c40f; border: none; border-radius: 50%;
             cursor: pointer; display: flex; justify-content: center; align-items: center;
         }
-        .play-triangle { border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 30px solid white; margin-left: 8px; }
+        .play-triangle { border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-left: 28px solid white; margin-left: 8px; }
 
-        /* SCANNER UI - Updated with Image */
+        /* SCANNER UI */
         #scanner-ui {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: none; flex-direction: column; justify-content: center; align-items: center;
             z-index: 50; pointer-events: none;
         }
-        .scanner-frame { 
-            width: 75vw; height: 75vw; 
-            position: relative; 
-            display: flex; justify-content: center; align-items: center;
-        }
+        .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
         .scanner-img { width: 70%; opacity: 0.4; filter: brightness(1.2); }
-        .scanner-line { 
-            position: absolute; width: 100%; height: 4px; 
-            top: 0; animation: scan 2s linear infinite; 
-        }
+        .scanner-line { position: absolute; width: 100%; height: 4px; background: #f1c40f; top: 0; animation: scan 2s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        /* STICKY VIDEO LAYER - Shifted Up */
-       #video-container {
-    position: fixed; 
-    top: 46%; /* Shifted up from 50% */
-    left: 50%; 
-    transform: translate(-50%, -50%);
-    width: 90%; 
-    height: 90%; 
-    display: none; 
-    background: transparent; /* Changed to transparent so the border looks cleaner */
-    z-index: 40;
-    justify-content: center; 
-    align-items: center;
-}
-        
-        /* Video Frame Styling */
-        #video-wrapper {
-            position: relative;
-            width: 100%;
-            display: flex;
-            justify-content: center;
+        /* STICKY VIDEO LAYER */
+        #video-container {
+            position: fixed; top: 46%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; height: 90%; display: none; z-index: 40; justify-content: center; align-items: center;
         }
-        
-        #video-container video { 
-            width: 100%; 
-            height: auto; 
-            border: 4px solid #f1c40f; 
-            border-radius: 30px; 
-            object-fit: cover;
+        #video-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
+        #video-container video { width: 100%; height: auto; border: 4px solid #f1c40f; border-radius: 30px; object-fit: cover; }
+
+        #close-sticky {
+            position: absolute; top: -10px; right: -10px; width: 45px; height: 45px; 
+            background: #fc0000; color: white; border: 2px solid #fff; border-radius: 50%;
+            font-size: 30px; font-weight: bold; cursor: pointer; z-index: 45; 
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* CLOSE BUTTON - Top Left Corner of Video */
-      #close-sticky {
-    position: absolute;     /* Adjusting to sit on the top-left edge of the 90% wide video */
-    top: 0%; 
-    left: 90%; 
-    width: 50px; 
-    height: 50px; 
-    background: #fc0000;
-    color: white; 
-    border: 2px solid #f1c40f; 
-    border-radius: 50%;
-    font-size: 50px; 
-    font-weight: bold; 
-    cursor: pointer; 
-    z-index: 45; /* Higher than video */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-
-
-        /* BUY NOW CTA */
-#buy-now-cta {
-    position: fixed; 
-    bottom: 30px; 
-    left: 50%; 
-    transform: translateX(-50%);
-    
-    /* Set dimensions to match your button image aspect ratio */
-    width: 280px;  
-    height: 70px; 
-    
-    /* Hide the HTML text 'BUY NOW' */
-    font-size: 0;
-    color: transparent;
-
-    /* Use the Raw GitHub URL */
-    background: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/target/blinkit-buy-now.png') no-repeat center;
-    background-size: contain; 
-    
-    border: none;
-    z-index: 60;
-    display: none; /* Becomes block via JS targetFound */
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
+        /* BUY NOW CTA - Image Only Mode */
+        #buy-now-cta {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 280px; height: 70px; font-size: 0; color: transparent; /* Hide Text */
+            background: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/target/blinkit-buy-now.png') no-repeat center;
+            background-size: contain; border: none; z-index: 60; display: none;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+        }
     </style>
 </head>
 <body>
 
     <div id="welcome-page">
-        <button id="play-button"><div class="play-triangle"></div></button>
-        <div style="color:white; margin-top:15px; font-weight:bold;">START EXPERIENCE</div>
+        <div id="bottom-sheet">
+            <img src="https://mahesh2710.github.io/ARData/target/blinkit_scanner.png" class="overlay-img">
+            <div style="text-align: center;">
+                <button id="play-button"><div class="play-triangle"></div></button>
+                <div style="color:#333; margin-top:12px; font-weight:bold; font-size: 0.9rem;">TAP TO START</div>
+            </div>
+        </div>
     </div>
 
     <div id="scanner-ui">
@@ -141,7 +112,7 @@
     <div id="video-container">
         <div id="video-wrapper">
             <button id="close-sticky">×</button>
-            </div>
+        </div>
     </div>
 
     <a href="https://blinkit.com" target="_blank" id="buy-now-cta">BUY NOW</a>
@@ -203,7 +174,7 @@
             if (canSticky && hasFoundOnce) {
                 arVideoRenderer.setAttribute('visible', 'false');
                 videoContainer.style.display = 'flex';
-                videoWrapper.appendChild(video); // Append to wrapper, not container
+                videoWrapper.appendChild(video);
                 video.play();
             } else {
                 video.pause();
