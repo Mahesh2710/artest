@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Blinkit AR Experience - Stable</title>
+    <title>Blinkit AR Experience</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -137,7 +137,7 @@
             <a-text 
                 value="BLINKIT" 
                 align="center" 
-                color="#FFFF00" 
+                color="#FFFFF" 
                 width="5" 
                 position="0 1.2 0.2"
                 font="roboto">
@@ -230,6 +230,20 @@
             scannerUi.style.display = 'flex';
             video.pause();
             document.querySelector('a-assets').appendChild(video);
+        });
+
+        // --- NEW REDIRECTION LOGIC ---
+        buyNowBtn.addEventListener('click', () => {
+            video.pause(); // Pause the video immediately
+            videoContainer.style.display = 'none'; // Hide the sticky UI
+            isStickyEnabled = false; // Disable sticky mode so it doesn't pop up again
+        });
+
+        // Fail-safe: Pause if user hides the tab or minimizes the app
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                video.pause();
+            }
         });
     </script>
 </body>
