@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Blinkit AR Experience</title>
+    <title>Blinkit AR Experience - Live Refresh</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -14,7 +18,7 @@
 
         #welcome-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: #1a1a1a url('https://mahesh2710.github.io/ARData/target/blinkit_poster.jpg') center/cover;
+            z-index: 100; background: #1a1a1a url('https://akm-img-a-in.tosshub.com/app/at-app/dynamic_data/welcomeposter/BlinkitWelcome.png') center/cover;
             display: flex; align-items: flex-end;
         }
 
@@ -85,7 +89,7 @@
         #buy-now-cta {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 280px; height: 70px; display: none; z-index: 60;
-            background: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/target/blinkit-buy-now.png') no-repeat center/contain;
+            background: url('https://akm-img-a-in.tosshub.com/app/at-app/dynamic_data/ctaimg/blinkit-cta.png') no-repeat center/contain;
         }
     </style>
 </head>
@@ -106,7 +110,7 @@
 
     <div id="scanner-ui">
         <div class="scanner-frame">
-            <img src="https://mahesh2710.github.io/ARData/target/blinkit_scanner.png" class="scanner-img">
+            <img src="https://akm-img-a-in.tosshub.com/app/at-app/dynamic_data/scanner/BlinkIt.png" class="scanner-img">
             <div class="scanner-line"></div>
         </div>
         <div style="color:white; margin-top:20px; font-weight:bold; text-shadow: 0 2px 4px #000;">SCAN THE PRODUCT IMAGE</div>
@@ -121,14 +125,15 @@
     <a href="https://blinkit.com/s/?q=holi" target="_blank" id="buy-now-cta"></a>
 
     <a-scene 
-        mindar-image="imageTargetSrc: https://mahesh2710.github.io/ARData/target/blinkit_new.mind; autoStart: false; uiScanning: #none; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 10; warmupTolerance: 5;" 
+        id="ar-scene"
+        mindar-image="imageTargetSrc: https://akm-img-a-in.tosshub.com/app/at-app/dynamic_data/webtarget/blinkit.mind?v=1.0.1; autoStart: false; uiScanning: #none; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 10; warmupTolerance: 5;" 
         device-orientation-permission-ui="enabled: false"
         vr-mode-ui="enabled: false"
         renderer="antialias: true; colorManagement: true; precision: medium;">
         
         <a-assets>
-            <video id="myVideo" src="https://mahesh2710.github.io/ARData/video/Blinkit.mp4" 
-                    loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></video>
+            <video id="myVideo" src="https://akm-img-a-in.tosshub.com/app/at-app/dynamic_data/video/Blinkit.mp4?v=1.0.1" 
+                   loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls-enabled="false"></a-camera>
@@ -162,6 +167,11 @@
         let isStickyEnabled = true;
         let hasFoundOnce = false;
         let permissionInterval = null;
+
+        // Force Video Reload on load to clear buffer
+        window.addEventListener('load', () => {
+            video.load();
+        });
 
         setTimeout(() => {
             playBtn.style.display = 'flex';
@@ -232,14 +242,12 @@
             document.querySelector('a-assets').appendChild(video);
         });
 
-        // --- NEW REDIRECTION LOGIC ---
         buyNowBtn.addEventListener('click', () => {
-            video.pause(); // Pause the video immediately
-            videoContainer.style.display = 'none'; // Hide the sticky UI
-            isStickyEnabled = false; // Disable sticky mode so it doesn't pop up again
+            video.pause(); 
+            videoContainer.style.display = 'none'; 
+            isStickyEnabled = false; 
         });
 
-        // Fail-safe: Pause if user hides the tab or minimizes the app
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 video.pause();
